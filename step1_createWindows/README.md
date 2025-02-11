@@ -27,4 +27,14 @@ In this step, we need to check if the windows obtained are correct, non-redundan
 2. Sequences with polyN (N=A|T|G|C) will not form base-pairs and hence can be discarded.
 3. Windows can be identical (e.g. genomes from similar organisms, gene duplications, etc). These windows are redundant and thus only 1 is retained as a representative.
 
-All this is taken care with 2 scripts: 1. removeNs_polyN_windows.pl and 2. removeDuplicates.pl. The scripts can be executed using process_windows_job.sh script. The output of script 1 is taken as input to script 2, resulting in a final output file ending with _uniq.fasta.
+All this is taken care with 2 scripts: 1. removeNs_polyN_windows.pl and 2. removeDuplicates.pl. The scripts can be executed using process_windows_job.sh script. The output of script 1 is taken as input to script 2, resulting in a final output file ending with \_uniq.fasta.
+
+### Retreiving information about N-content within genomes (sanity check - Optional)
+
+If you wish to know how much of your sequences are reliable, you can calculate the Ns in your input sequences. Script count_Ns.pl will count the occurrence of Ns in the sequences. The script can handle multi-fasta file. Command is:
+	
+	perl countNs.pl seq.fasta > seq_nuclInfo.csv
+
+This can be used as input to plot the data using the script boxPlot_distributionOfNsInGenomes.R
+
+

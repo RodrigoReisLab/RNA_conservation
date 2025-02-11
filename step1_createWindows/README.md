@@ -18,6 +18,7 @@ In the above example, input sequence will be cut into windows of length 100 with
 **Note:** If you have more than one input file, you can use the windowing_job.sh script to execute the program.
 
 **Important:** Merge all the windows file into 1 file.
+
 	cat file1_windows.fasta file2_windows.fasta > all_windows.fasta
 
 ### Check and process windows for bad sequence content

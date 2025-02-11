@@ -8,3 +8,18 @@ Figure 1: Overview of the pipeline. Each of the box are color-coded and marked t
 
 
 Scripts and tools relevant to each step are in the respective directories.
+
+**For the entire pipeline, following containers and environments files will be easy to use.**
+
+1. rnatools Docker file -  easy access to tools like Vienna RNA package, LocARNA, R-scape and HMMER. It can be taken from [dockerhub.](https://hub.docker.com/) and use the following commands to get the container. 
+ You can use either docker or singularity [Recommended] to pull the image:
+
+        docker pull dollycm/rnatools:v2
+        
+        OR
+
+        singularity pull docker://dollycm/rnatools:v2
+
+2. mmseqs2 YAML - for clustering of sequences. YAML file is provided in the respective Step2 clustering folder
+
+3. seqtk YAML - for basic sequence manipulations, including reverse complement input sequences.

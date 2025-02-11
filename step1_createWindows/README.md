@@ -14,7 +14,7 @@ If -p set to 0, the windows will be non-overlapping.\
 -O: output file name 
 
 
-In the above example, input sequence will be cut into windows of length 100 with an overlap of 10nt.
+In the above example, input sequence will be cut into windows of length 100 with an overlap of 10nt.\
 **Note:** If you have more than one input file, you can use the windowing_job.sh script to execute the program.
 
 **Important:** Merge all the windows file into 1 file.

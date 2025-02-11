@@ -4,7 +4,10 @@ The pipeline is in 6-7 steps starting from input of sequences. This can either b
 
 Figure 1: Overview of the pipeline. Each of the box are color-coded and marked to help identify the steps to be followed. Each of the steps are dispensable depending on which step user wishes to perform. 
 
-<center><img src="pipeline.png" width="400"/></center>
+<div align="center">
+![alt text](Figure 1)
+<img src="pipeline.png" width="400"/>
+</div>
 
 
 Scripts and tools relevant to each step are in the respective directories.

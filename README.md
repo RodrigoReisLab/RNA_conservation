@@ -16,10 +16,12 @@ Scripts and tools relevant to each step are in the respective directories.
 
         docker pull dollycm/rnatools:v2
         
-        OR
+     OR
 
         singularity pull docker://dollycm/rnatools:v2
 
 2. mmseqs2 YAML - for clustering of sequences. YAML file is provided in the respective Step2 clustering folder
 
 3. seqtk YAML - for basic sequence manipulations, including reverse complement input sequences.
+
+StepMisc folder contains miscellaneous steps to use the motifs for analyses in obtaining phylogenetic spread and gene context.

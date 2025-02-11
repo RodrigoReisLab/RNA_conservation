@@ -4,7 +4,7 @@ Perform this step only if you are not sure of the similarity of your input seque
 **Note:** This step requires use of a conda environments. Kindly use the relevant .yml files provided in this folder.
 
 #### Load conda environment (Anaconda3)
-If you are new to conda, you can familiarize yourself with [Manage conda environment] (https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). If you do not have conda installed, please follow [Installation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) guidelines. I have used Anaconda3 for my studies. Once installed, you can activate conda as follows:
+If you are new to conda, you can familiarize yourself with [Manage conda environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). If you do not have conda installed, please follow [Installation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) guidelines. I have used Anaconda3 for my studies. Once installed, you can activate conda as follows:
 
 	conda activate
 	module load Anaconda3 [Specific to users using Ubelix UniBe server]
@@ -70,6 +70,7 @@ Output files will be generated with filenames ending as below, which we will use
 1. _\_cluster.tsv_: This file includes 2 columns (tab separated). 1st column contains a representative chosen by the tool for a cluster. All members in that cluster are listed in 2nd column. In this pipeline, we use the representative as an identifier for that cluster throughout the study.
 Example of the output file:  
 	
+<pre> ```tsv
 	NC_008590.1_220_38500_38750     NC_031887.1_225_39375_39625  
 	NC_008590.1_220_38500_38750     NC_044642.1_223_39025_39275  
 	NC_008590.1_220_38500_38750     NC_029212.1_150_26250_26500r  
@@ -85,7 +86,8 @@ Example of the output file:
 	NC_038124.1_271_47425_47675     NC_043822.1_379_66325_66575  
 	NC_038124.1_271_47425_47675     NC_040966.1_312_54600_54850  
 	NC_038124.1_271_47425_47675     NC_021647.1_47_8225_8475r  
-
+```
+</pre>
 
 2. _\_all_seqs.fasta_: Contains the sequences in FASTA format separated by an additional header above marked with a cluster representative.
 

@@ -13,10 +13,10 @@ If you are new to conda, you can familiarize yourself with [Manage conda environ
 
 	eval "$(conda shell.bash hook)"
 
-### Optional: Reverse complement sequences using seqtk
+## Optional: Reverse complement sequences using seqtk
 The windows (\_uniq.fasta) obtained from Step1 are taken as input. First step is to obtain reverse complementary windows of all the unique windows. This is because the RNA structure prediction step only takes sequences as given and does not automatically handle reverse complementary strand (in genomes- the minus strand). However this step is optional if the input is the desired strand (eg. UTRs of coding-genes will have only a specific strand)
 
-#### Create environment using seqtk_env.yml file.
+### Create environment using seqtk_env.yml file.
 
 	conda env create -f seqtk_env.yml
 
@@ -24,11 +24,11 @@ This will create an environment with access to tool seqtk as ready to use. The e
 
 	conda env list
 
-#### Activate the newly created environment.
+### Activate the newly created environment.
 	
 	conda activate seqtk_env
 	
-#### Reverse-complement sequences.
+### Reverse-complement sequences.
 i. Use the \_uniq.fasta file obtained from step1 as input 
 
 	seqtk seq -r in_uniq.fasta > out_revComp.fasta
@@ -41,8 +41,8 @@ iii. Merge the positive and reverse complementary windows in 1 file.
 
 	cat in_uniq.fasta out_revComp.fasta > all_windows.fasta
 
-### Remove highly similar windows and cluster some-what similar windows using mmseqs2
-#### Create environment using mmseq2env_list.yml file.
+## Remove highly similar windows and cluster some-what similar windows using mmseqs2
+### Create environment using mmseq2env_list.yml file.
 
 	conda env create -f mmseq2env_list.yml
 
@@ -50,18 +50,18 @@ This will create an environment with access to tool mmseqs2 as ready to use. The
 
 	conda env list
 
-#### Activate the newly created environment.
+### Activate the newly created environment.
 	
 	conda activate mmseq2env
 
-#### Remove highly similar sequences
+### Remove highly similar sequences
 
 	mmseqs easy-cluster all_plant_chloroplast_windows_processed_uniq.fasta mmseq2_covmode0_PID95_cov80 tmp_covmode0_PID95_cov80 -c 0.80 --threads 16 --kmer-per-seq 200 --min-seq-id 0.95 --cov-mode 0 --filter-hits 1
 
 --min-seq-id 0.95 will help cluster sequences ≥ 95%, which can be modified by the user. Such groups of sequences can be discarded. It also outputs a file ending in \_rep_seq.fasta. This file retains a representative of all these similar sequences.\
 Additionally, the other options make sure to obtain appropriate clusters imposing sequence coverage (subject and query) of 80% and --filter-hits 1 is to filter the hits based on the thresholds given.
 
-#### Cluster sequences with some-what sequences similarity
+### Cluster sequences with some-what sequences similarity
 Here, we use the output from the above step (\_rep_seq.fasta) and --min-seq-id is set to 0.50 (50% sequence similarity). Rest all parameters are set as above command.
  
 	mmseqs easy-cluster mmseq2_covmode0_PID95_cov80_rep_seq.fasta mmseq2_repSeqs_covmode0_PID50_cov80 tmp_repSeqs_covmode0_PID50_cov80 -c 0.80 --threads 16 --min-seq-id 0.50 --cov-mode 0 --filter-hits 1
@@ -70,22 +70,8 @@ Output files will be generated with filenames ending as below, which we will use
 1. _\_cluster.tsv_: This file includes 2 columns (tab separated). 1st column contains a representative chosen by the tool for a cluster. All members in that cluster are listed in 2nd column. In this pipeline, we use the representative as an identifier for that cluster throughout the study.
 Example of the output file:  
 	
-	NC_008590.1_220_38500_38750     NC_031887.1_225_39375_39625  
-	NC_008590.1_220_38500_38750     NC_044642.1_223_39025_39275  
-	NC_008590.1_220_38500_38750     NC_029212.1_150_26250_26500r  
-	NC_008590.1_220_38500_38750     NC_024258.1_224_39200_39450  
-	NC_008590.1_220_38500_38750     NC_042956.1_218_38150_38400r  
-	NC_008590.1_220_38500_38750     NC_044800.1_221_38675_38925r  
-	NC_008590.1_220_38500_38750     NC_027837.1_214_37450_37700r  
-	NC_008590.1_220_38500_38750     NC_042825.1_93_16275_16525r  
-	NC_008590.1_220_38500_38750     NC_037832.1_217_37975_38225r  
-	NC_038124.1_271_47425_47675     NC_038124.1_271_47425_47675  
-	NC_038124.1_271_47425_47675     NC_036014.1_310_54250_54500r  
-	NC_038124.1_271_47425_47675     NC_043866.1_305_53375_53625r  
-	NC_038124.1_271_47425_47675     NC_043822.1_379_66325_66575  
-	NC_038124.1_271_47425_47675     NC_040966.1_312_54600_54850  
-	NC_038124.1_271_47425_47675     NC_021647.1_47_8225_8475r  
-
+	```NC_008590.1_220_38500_38750     NC_031887.1_225_39375_39625  NC_008590.1_220_38500_38750     NC_044642.1_223_39025_39275  NC_008590.1_220_38500_38750     NC_029212.1_150_26250_26500r  NC_008590.1_220_38500_38750     NC_024258.1_224_39200_39450  NC_008590.1_220_38500_38750     NC_042956.1_218_38150_38400r  NC_008590.1_220_38500_38750     NC_044800.1_221_38675_38925r  NC_008590.1_220_38500_38750     NC_027837.1_214_37450_37700r  NC_008590.1_220_38500_38750     NC_042825.1_93_16275_16525r  NC_008590.1_220_38500_38750     NC_037832.1_217_37975_38225r  NC_038124.1_271_47425_47675     NC_038124.1_271_47425_47675  NC_038124.1_271_47425_47675     NC_036014.1_310_54250_54500r  NC_038124.1_271_47425_47675     NC_043866.1_305_53375_53625r  NC_038124.1_271_47425_47675     NC_043822.1_379_66325_66575  NC_038124.1_271_47425_47675     NC_040966.1_312_54600_54850  NC_038124.1_271_47425_47675     NC_021647.1_47_8225_8475r  
+```
 2. _\_all_seqs.fasta_: Contains the sequences in FASTA format separated by an additional header above marked with a cluster representative.
 
 Example output:  

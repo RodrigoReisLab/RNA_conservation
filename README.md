@@ -4,7 +4,7 @@ The pipeline is in 6-7 steps starting from input of sequences. This can either b
 
 Figure 1: Overview of the pipeline. Each of the box are color-coded and marked to help identify the steps to be followed. Each of the steps are dispensable depending on which step user wishes to perform. 
 
-<img src="RNAconservation_project/conservedStructurePredictionPipeline/pipeline.png" width="128"/>
+<img src="pipeline.png" width="128"/>
 
 
 Scripts and tools relevant to each step are in the respective directories.

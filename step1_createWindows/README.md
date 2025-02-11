@@ -13,7 +13,17 @@ Command:
 If -p set to 0, the windows will be non-overlapping.\
 -O: output file name 
 
+
+In the above example, input sequence will be cut into windows of length 100 with an overlap of 10nt.
 **Note:** If you have more than one input file, you can use the windowing_job.sh script to execute the program.
 
-### Check and process windows for bad sequence content
+**Important:** Merge all the windows file into 1 file.
+	cat file1_windows.fasta file2_windows.fasta > all_windows.fasta
 
+### Check and process windows for bad sequence content
+In this step, we need to check if the windows obtained are correct, non-redundant and unique. Possible reasons can be
+1. Due to sequencing errors, there may be sequences with Ns which has to be removed. Here, we discard any windows containing 'N' (ignoring case) in the sequence. 
+2. Sequences with polyN (N=A|T|G|C) will not form base-pairs and hence can be discarded.
+3. Windows can be identical (e.g. genomes from similar organisms, gene duplications, etc). These windows are redundant and thus only 1 is retained as a representative.
+
+All this is taken care with 2 scripts: 1. removeNs_polyN_windows.pl and 2. removeDuplicates.pl. The scripts can be executed using process_windows_job.sh script. The output of script 1 is taken as input to script 2, resulting in a final output file ending with _uniq.fasta.

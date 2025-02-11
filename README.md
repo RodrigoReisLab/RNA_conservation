@@ -2,17 +2,13 @@
 
 The pipeline is in 6-7 steps starting from input of sequences. This can either be entire genomes or sequences of choice (eg. UTR regions, RNAs from transcriptomes). Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
 
-Figure 1: Overview of the pipeline. Each of the box are color-coded and marked to help identify the steps to be followed. Each of the steps are dispensable depending on which step user wishes to perform. 
-
 <div align="center">
-![alt text](Figure 1)
-<img src="pipeline.png" width="400"/>
+![Figure 1 pipeline for RNA secondary structure](pipeline.png)
 </div>
+Figure 1: Overview of the pipeline. Each of the box are color-coded and marked to help identify the steps to be followed. Each of the steps are dispensable depending on which step user wishes to perform. Scripts and tools relevant to each step are in the respective directories.
 
 
-Scripts and tools relevant to each step are in the respective directories.
-
-**For the entire pipeline, following containers and environments files will be easy to use.**
+### For the entire pipeline, following containers and environments files will be easy to use.
 
 1. rnatools Docker file -  easy access to tools like Vienna RNA package, LocARNA, R-scape and HMMER. It can be taken from [dockerhub.](https://hub.docker.com/) and use the following commands to get the container. 
  You can use either docker or singularity [Recommended] to pull the image:

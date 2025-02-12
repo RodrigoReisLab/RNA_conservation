@@ -103,7 +103,7 @@ Since, the next steps taken multi-fasta file as input and to process each cluste
 
 To identify the number of sequences in a cluster, use the BASH command as follows:
 
-	cut -f1 mmseqs_out_cluster.tsv | sort | uniq -dc
+	cut -f1 mmseqs_out_cluster.tsv | sort | uniq -dc > cluster_count.tsv
 
 Expected output (tab-separated list): First column contains the number of members, second column contains the identifier (representative of the cluster). We use this to split the cluster fasta file.
 

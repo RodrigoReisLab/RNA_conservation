@@ -25,12 +25,15 @@ echo -e "Considering chunk: $list\n" > clustalo_${list}.log;
 for i in `cut -f2 "$list"`;
 do
 	clusterName=$i;
+	#Modify the path below in the if condition, checking if the input fasta file exists.
 	if [ -f /storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/clustering/splits/${clusterName}_cluster.fasta ]
 	then
 		mkdir "$clusterName";
 		cd "$clusterName";
 
 		echo -e "Input cluster file exists..\nProceeding with further steps.\n" >> clustalo_${list}.log;
+
+		#Modify the path to the input FASTA sequences.
 		cp /storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/clustering/splits/${clusterName}_cluster.fasta .
 
 		echo -e "Starting clustalo run for $clusterName\n" >> clustalo_${list}.log;

@@ -16,21 +16,26 @@
 date
 PD=`pwd`;
 list=$1;
-clusterName=$(awk -v row="${SLURM_ARRAY_TASK_ID}" 'NR==row {print $2}' "$list")
+#clusterName=$(awk -v row="${SLURM_ARRAY_TASK_ID}" 'NR==row {print $2}' "$list")
 
-if [ -f /storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/RNAlalifold/${clusterName}/${clusterName}_aligned.aln ]
-then
-	cd ./${clusterName}/
-	echo -e "${clusterName} Alignment file present in the folder.\n Proceeding to screen for structures with RNALalifold\n";
-	#cp /storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/RNAlalifold/${clusterName}/${clusterName}_aligned.aln .
+for $clusterName in `cut -f2 $list`
+do
+	#Modify path in the if condition to the .aln files obtained on performing clustal omega
+	if [ -f /storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/RNAlalifold/${clusterName}/${clusterName}_aligned.aln ]
+	then
+		cd ./${clusterName}/
+		echo -e "${clusterName} Alignment file present in the folder.\n Proceeding to screen for structures with RNALalifold\n";
+		#cp /storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/RNAlalifold/${clusterName}/${clusterName}_aligned.aln .
+	
+		echo -e "Starting RNALalifold run for $clusterName\n";
 
-	echo -e "Starting RNALalifold run for $clusterName\n";
-	singularity exec -B ../${clusterName}:/input /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v1.sif RNALalifold -T 21 --noLP /input/${clusterName}_aligned.aln > ${clusterName}_RNALalifold.out 
-	echo -e "Finished RNALalifold run for $clusterName\n";
-	cd $PD
-else
-	echo -e "$clusterName FASTA file not found in the directory: Check the input file names and file paths in the code! \n";
-
-fi
-
+		#Modify the path to rnatools_v1.sif
+		singularity exec -B ../${clusterName}:/input /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v1.sif RNALalifold -T 21 --noLP /input/${clusterName}_aligned.aln > ${clusterName}_RNALalifold.out 
+		echo -e "Finished RNALalifold run for $clusterName\n";
+		cd $PD
+	else
+		echo -e "$clusterName FASTA file not found in the directory: Check the input file names and file paths in the code! \n";
+	
+	fi
+done
 date

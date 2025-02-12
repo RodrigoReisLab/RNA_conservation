@@ -40,3 +40,10 @@ Command to execute the script:
 
 
 **Note:** All files and folders are named based on the cluster representative name.
+
+The output will be in the '\_RNALalifold.out' which will include secondary structure in dot-bracket format. Only the clusters with 2 base-pairs predicted are considered to the next step.
+Command used to obtain clusters with potential to form secondary structure:
+
+	for i in `find -iname "*_RNALalifold.out"`; do grep -m1 -H "((" $i; done | cut -d':' -f1 | cut -d'/' -f3 | sed -e 's/_RNALalifold.out//g' > RNALalifold_passedList.txt
+
+

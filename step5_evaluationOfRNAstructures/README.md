@@ -22,15 +22,15 @@ ii. _evaluate the alignment_
 
 <pre>
 	'e|extension=s'		=> \$ext, 		#any flanking in filename that should be replaced. mandatory to remove .sto from extension - to obtain clean output filename (Here, in this example '_trimmed.sto' from input filename (motif_trimmed.sto) has to be removed.
-	'mt|motif_threshold=f'	=> \$motif_thresh, 	#total motif threshold [0.0-1.0] => set to 0.5 for evaluation/cleaning step
-	't|bp_threshold=f'	=> \$bp_thresh, 	#each stem in the motif should have x% of base-pairs [0.0-1.0] => set to 0.75 for evaluation/cleaning step
+	'mt|motif_threshold=f'	=> \$motif_thresh, 	#total motif threshold [0.0-1.0] => set to 0.5 for evaluation/cleaning step (column labeled bp_threshold in output file)
+	't|bp_threshold=f'	=> \$bp_thresh, 	#each stem in the motif should have x% of base-pairs [0.0-1.0] => set to 0.75 for evaluation/cleaning step. (column labeled HairpinBPs_per in output file)
 	'gc|bp_gc=f'		=> \$gc_bp_thresh, 	#each stem in the motif should have x% of GC/CG base-pairs [0.0-1.0] -> set to 0.30
 	'd|duplication=i'	=> \$dupl_flag,		#A flag to include duplications in the alignment and all the calculations: 0: duplications OFF - removes duplicationsand 1: duplications ON, retains duplications in the alignment
 	'h|help'		=> \$help,
 	'manual'		=> \$man
 </pre>
 
-It will also output saying if the input alignment is ranked High, Mid or Low on STDOUT. This can be written to any output file (eg: allClusters_evaluation.tsv)
+It will also output saying if the input alignment is ranked High, Mid or Low on STDOUT. This can be written to any output file (eg: allClusters_evaluation.tsv). If the motif consists of ≤10 base-pairs (ie. total bps ≤ 10) than it is mandatory that the sequence forms all base-pairs. If it does not, the stem-loop is discarded and hence in the evaluation, #BPsActuallyForming will be set to 0.
 
 Passed sequences ranked High and Mid will be written in stockholm alignment format to the output file (eg: 'motif_cleaned.sto')
 The tab-separated output file 'motif_evaluated.tsv' will contain information of each sequence in the alignment has passed or failed. The output will contain columns describing the length of the sequence, GC content of the sequence, Threshold deciding how many base-pairs for this motif should be formed, number of total base-pairs, number of opening and closing base-pairs (individual brackets marking the positions as base-paired), percentage of hairpin forming for each stem-loop, number of base-pairs actually formed by the sequence, if there are identical sequences (redundant) and finally if the sequence has passed the evaluation. An output example below shows this motif is a 2 stem-loop structure with 10 base-pairs of which a minimum 5bp should be formed by any sequence.  

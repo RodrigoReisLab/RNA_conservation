@@ -24,3 +24,5 @@ Figure 1: Overview of the pipeline. Each of the box are color-coded and marked t
 3. seqtk YAML - for basic sequence manipulations, including reverse complement input sequences. YAML file is provided in the respective Step2 clustering folder.
 
 StepMisc folder contains miscellaneous steps to use the motifs for analyses in obtaining phylogenetic spread and gene context.
+
+**Note:** Some of the job bash scripts have commands for SLURM based execution. If executing the scripts on local machine, directly run the programs as normal bash scripts. The SLURM commands will not affect the performance of the scripts.

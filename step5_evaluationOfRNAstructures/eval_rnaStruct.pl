@@ -2,6 +2,7 @@
 use POSIX;
 use Getopt::Long;
 use Pod::Usage;
+use Data::Dumper;
 
 #Reads 1 input alignment file (stockholm format) and outputs 3 files (cleaned alignment: stockholm, evaluation of each RNA candidate and the total cleaned alignment: tab-separated)
 
@@ -46,8 +47,8 @@ if (!defined $bp_thresh)
 }
 if (!defined $gc_bp_thresh)
 {
-        print "%GC/CG threshold in base-pairs is not provided. Setting gc_bp_threshold to default of 0.30.\n";
-        $gc_bp_thresh = 0.30;
+		print "%GC/CG threshold in base-pairs is not provided. Setting gc_bp_threshold to default of 0.30.\n";
+		$gc_bp_thresh = 0.30;
 }
 
 open(ALN, $ARGV[0]);
@@ -173,6 +174,28 @@ my $uniqAln_size = @uniq_aln;
 #2. Each sequence in the alignment is evaluated for the structure. if it is 5-9bp, sequences should contain the entire motif,  else the sequences should contain 50% of the structure
 #3. The number of sequences at the end of evaluation should be atleast 7 sequences. More the sequences, merrier it is!
 
+#Extracting hairpins step-by-step
+#Extracting base-pairs
+my $pairs = extract_pairs_from_cons($ssConsensus);
+
+#Making pair matrix and finding hairpins from the matrix. These may include hairpins which are nested and declared as 1 hairpin. Need to separate the hairpins and hence nesting hairpins need to be identified.
+my $base_pair_matrix = create_pairMatrix($pairs);
+open(my $mat, ">${cluster}_pair_matrix.txt") or die "Could not open file '${cluster}_pair_matrix.txt' $!";
+foreach my $row (@$base_pair_matrix) {
+	my $line = join("\t", @$row);  # Tab-separated values
+	print $mat "$line\n";
+}
+close($mat);
+
+# Find the outermost hairpin/ nested hairpins
+my $final_hairpins = find_hairpin_with_pair($pairs);
+open(my $hp, ">${cluster}_detected_hairpins.txt") or die "Could not open file '${cluster}_detected_hairpins.txt' $!";
+foreach my $hairpin (@$final_hairpins) {
+	my $line = join("\t", map { join(",", @$_) } @$hairpin);
+	print $hp "$line\n";
+}
+close($hp);
+
 #Counting number of opening base-pairs
 my @open_bracket_indices, @close_bracket_indices;
 while ($ssConsensus =~ /$stem_open_brackets/g)
@@ -185,6 +208,7 @@ while ($ssConsensus =~ /$stem_close_brackets/g)
 	my $index = $-[0];
 	push @close_bracket_indices, $index;
 }
+
 my $total_open_brackets = @open_bracket_indices;
 my $total_close_brackets = @close_bracket_indices;
 my @passed_cand;
@@ -223,9 +247,9 @@ if($#passed_cands > 0)
 	open(STO, ">$ARGV[1]");
 	foreach my $t (@top_lines)
 	{
-	        $t =~ s/^\s//;
+		 $t =~ s/^\s//;
 		$t= "#=GF SQ $passed_candidates_count\n" if($t =~ /SQ/);
-	        print STO $t;
+		 print STO $t;
 	}
 	print STO "#=GF ID $cluster\n#=GF CC Processed Motif region (trimAlignment.pl) are screened and passed candidates are written \n\n";
 	foreach $passed (@passed_cands)
@@ -266,7 +290,7 @@ sub motif_seen
 			#Getting coordinates for RNAs with identical sequence homologs
 			foreach my $uniq_key (keys %uniq_cands)
 			{
-				push(@{ $duplHits{$uniq_key} }, $k) if($uniq_cands{$uniq_key} eq $motif_seq)
+	push(@{ $duplHits{$uniq_key} }, $k) if($uniq_cands{$uniq_key} eq $motif_seq)
 			}
 		}
 
@@ -289,6 +313,130 @@ sub motif_seen
 	return(\@uniq_arr, \@duplRNAcands);
 }
 
+#Getting base-pairs and identify hairpins from consensus structure
+sub extract_pairs_from_cons {
+		my $structure = $_[0];
+		my @stack, @pairs, @tmp;
+		for my $i (0 .. length($structure) - 1)
+		{
+	my $char = substr($structure, $i, 1);
+	if ($char =~ /$stem_open_brackets/) 
+	{
+		push(@stack, $i);
+	} 
+	elsif ($char =~ /$stem_close_brackets/) 
+	{
+		my $hp_start = pop @stack;
+		push(@tmp, [$hp_start, $i]);
+	}
+		}
+		
+		@pairs = sort { $a->[0] <=> $b->[0] } @{tmp};
+	return \@pairs;
+}
+
+#Subroutine to find the hairpin containing the nesting boundary base-pair
+sub find_hairpin_with_pair {
+	my ($pairs_ref) = @_;
+	my @pairs = @$pairs_ref;
+	my @separated_hairpins;
+	my %visited;
+
+	# Construct the adjacency list for all pairs
+	my %graph;
+	foreach my $pair (@pairs) {
+		my ($row, $col) = @$pair;
+		$graph{"$row,$col"} = [];
+	}
+
+	# Build the graph (connect pairs that are adjacent based on are_connected)
+	foreach my $pair (@pairs) {
+		my ($row1, $col1) = @$pair;
+		foreach my $neighbor (@pairs) {
+			my ($row2, $col2) = @$neighbor;
+			next if $pair eq $neighbor;
+			if (are_connected($row1, $col1, $row2, $col2)) {
+	push @{$graph{"$row1,$col1"}}, "$row2,$col2";
+			}
+		}
+	}
+
+	# Perform DFS to find all connected components
+	sub dfs {
+		my ($node, $component) = @_;
+		return if $visited{$node};
+		$visited{$node} = 1;
+		push @$component, $node;
+		foreach my $neighbor (@{$graph{$node}}) {
+			dfs($neighbor, $component);
+		}
+	}
+
+	my @components;
+	foreach my $node (keys %graph) {
+		next if $visited{$node};
+		my @component;
+		dfs($node, \@component);
+		push @components, \@component;
+	}
+
+	# Convert components back to pairs and add to separated_hairpins
+	foreach my $component (@components) {
+		my @hairpin = map { [ split /,/, $_ ] } @$component;
+		push @separated_hairpins, \@hairpin;
+	}
+
+	# Sort each hairpin
+	foreach my $hairpin (@separated_hairpins) {
+		@$hairpin = sort { $a->[0] <=> $b->[0] || $a->[1] <=> $b->[1] } @$hairpin;
+	}
+
+	# Sort all hairpins
+	@separated_hairpins = sort {
+		my $cmp = join(',', map { sprintf("%04d%04d", $_->[0], $_->[1]) } @$a);
+		my $cmp2 = join(',', map { sprintf("%04d%04d", $_->[0], $_->[1]) } @$b);
+		$cmp cmp $cmp2;
+	} @separated_hairpins;
+	
+	#print ">>>> Separated hairpins: \n", Dumper(\@separated_hairpins);
+	return \@separated_hairpins;
+}
+
+# Determine if two pairs are connected (more complex criteria)
+sub are_connected {
+	my ($row1, $col1, $row2, $col2) = @_;
+	# Flexible connectivity criteria, based on relative positions
+	return (abs($row1 - $row2) <= 12 && abs($col1 - $col2) <= 12) ||  # Adjacent
+		(abs($row1 - $row2) <= 12 && abs($col1 - $col2) <= 12) ||  # Diagonal
+		(abs($row1 - $row2) <= 12 && abs($col1 - $col2) <= 12);	# L-shaped
+}
+
+sub create_pairMatrix {
+	my ($pairs) = @_;
+	
+	# Determine the matrix size
+	my $max = 0;
+	foreach my $pair (@$pairs) {
+		$max = $pair->[1] if $pair->[1] > $max;
+	}
+	$max += 10;
+
+	# Initialize the matrix
+	my @matrix;
+	for my $i (0..$max) {
+		for my $j (1..$max) {
+			$matrix[$i][$j] = 0;
+		}
+	}
+
+	# Fill the matrix with the provided pairs
+	foreach my $pair (@$pairs) {
+		$matrix[$pair->[0]][$pair->[1]] = 1;
+	}
+	
+	return \@matrix;
+}
+
 #Evaluating structures
 sub eval_struct
 {
@@ -300,7 +448,7 @@ sub eval_struct
 	print OUT "seqID\tlength\tGCcontent\tbp_threshold\tTotalBPs\t#OpenBPs\t#ClosingBPs\tHairpinBPs_per\t#BPsActuallyForming\tRedundantRNAcandidates\tEvaluation\n";
 	$nucl = qr/[ATCGUatcgu]/;
 	
-	#Evaluating each candidate in the alignment (removed identical replicates)
+	#Evaluating each candidate in the alignment (removed/retained identical replicates)
 	foreach $cand (@input_aln)
 	{
 		my ($seq_id, $seq_cand) = split(/\t/, $cand);
@@ -319,32 +467,30 @@ sub eval_struct
 			$next_open = $close_bracket_indices[$#open_bracket_indices] if($i+1 > $#open_bracket_indices);
 			$open_brack_char = substr($seq_cand, $open_brack_loc, 1);
 			$close_brack_char = substr($seq_cand, $close_brack_loc, 1);
-
-			#Getting each stem-loop of the motif
-			if($next_open < $close_brack_loc)
-			{
-				push(@o_stem, $open_brack_loc);
-				push(@c_stem, $close_brack_loc);
-			}
-			else
-			{
-				#Getting the last base-pair of the stem
-				push(@o_stem, $open_brack_loc);
-				push(@c_stem, $close_brack_loc);
-				#Checking the base-pair potential between the nucleotides, this will affect the base-pairs that each sequence can form.
-				my ($sl_bp_count, $sl_bp_percent) = eval_stem_loop(\@o_stem,\@c_stem, $seq_cand);
-				$effective_bp_count += $sl_bp_count;
-				$total_bp_percent .= $sl_bp_percent;
-				$total_bp_percent .= "," unless $i == $#open_bracket_indices;
-				undef(@o_stem), undef(@c_stem);
-
-			}
-
+	
 			push(@o_nucl, $open_brack_char) if($open_brack_char =~ $nucl);
 			push(@c_nucl, $close_brack_char) if($close_brack_char =~ $nucl);
 			push(@open_brack_chars, $open_brack_char);
 			push(@close_brack_chars, $close_brack_char);
+
 		}
+		#Getting each stem-loop (hairpin) of the motif for each RNA candidates
+		foreach my $hp (@$final_hairpins)
+		{
+			foreach my $pair (@$hp) 
+			{
+				my ($open, $close) = @$pair;
+				push(@o_stem, $open);
+				push(@c_stem, $close);
+			}
+			#Checking the base-pair potential between the nucleotides, this will affect the base-pairs that each sequence can form.
+			my ($sl_bp_count, $sl_bp_percent) = eval_stem_loop($hp, $seq_cand);
+			$effective_bp_count += $sl_bp_count;
+			$total_bp_percent .= $sl_bp_percent;
+			$total_bp_percent .= "," unless $i == $#open_bracket_indices;
+			undef(@o_stem), undef(@c_stem), undef($sl_bp_count);
+		}
+
 		my $o_nucl_count = scalar @o_nucl;
 		my $c_nucl_count = scalar @c_nucl;
 
@@ -397,13 +543,16 @@ sub gcContent
 
 sub eval_stem_loop
 {
-	my ($open_ref, $close_ref, $seq) = @_;
+	#Check if it is a hairpin and no nested base-pairing is present
+	my ($hp_ref, $seq) = @_;
 	my $bp_passed=$gc=0;
-	for my $i (0 .. $#{$open_ref})
-	{
-		my $open_index = $open_ref->[$i];
-		my $close_index = $close_ref->[$#{$close_ref} - $i];
 
+	my @hp = @$hp_ref;
+	#print Dumper \@hp;
+	my $number_of_pairs = $#hp + 1;
+	foreach my $pair (@hp)
+	{
+		my ($open_index, $close_index) = @$pair;
 		$open_char = substr($seq, $open_index, 1);
 		$close_char = substr($seq, $close_index, 1);
 
@@ -414,22 +563,24 @@ sub eval_stem_loop
 
 			if(($open_char eq 'C' && $close_char eq 'G') || ($open_char eq 'G' && $close_char eq 'C'))
 			{
-				$gc += 1;
+	$gc += 1;
 			}
 		}
 	}
-
+	#print "cand: $number_of_pairs\t$bp_passed\t$gc\n";
 	#Evaluating if each stem of the RNA has 75% structure
-	my $result = $#{$open_ref} * $bp_thresh + 1;
+	#Getting the minimum number of base-pairs needed for it to be called a stem.
+	my $result = $number_of_pairs * $bp_thresh;
 	my $stem_thresh = $result >= int($result) + 0.5 ? ceil($result) : floor($result);
-
+	
 	#Total number of base-pairs
-	my $open_ref_length = scalar @$open_ref;
+	my $open_ref_length = $number_of_pairs;
 	my $bp_passed_per = ($bp_passed / $open_ref_length) * 100;
 	my $bp_passed_percent = sprintf("%.2f", $bp_passed_per);
 
-	$open_last = $open_ref->[-1];
-	$close_first = $close_ref->[0];
+	my $last_pair = $pairs[-1];
+	$open_last = $last_pair->[0];
+	$close_first = $last_pair->[1];
 	my $loop_nucl = $close_first - ($open_last+1);
 	my $loop=substr($seq, $open_last+1, $loop_nucl);
 	$loop =~ s/[-\._~]//g;
@@ -452,11 +603,21 @@ sub eval_stem_loop
 
 	#If GC base-pairs not part of stem, stems do not contribute to the motf, thus setting base-pairs as 0
 	$bp_passed = 0 if($gc < $gc_thresh);
-
+	
 	return($bp_passed, $bp_passed_percent);
 
 }
-undef($ssConsensus), undef(@alignments), undef(@aln), undef(@open_bracket_indices), undef(@close_bracket_indices), undef(@passed_cands);
+undef($ext), undef($motif_thresh), undef($bp_thresh), undef($gc_bp_thresh), undef($help), undef($man), undef($dupl_flag);
+undef(@aln), undef($cluster), undef($n), undef(@top_lines), undef(@ss_cons), undef($ss_cons_len);
+undef($motif_loc), undef($ssConsensus), undef($ss_consLen), undef($stem_open_brackets), undef($stem_close_brackets);
+undef(@sorted), undef($line), undef($lineIdx), undef($word), undef($w1), undef($p), undef($stem_start_pos), undef($stem_end_pos);
+undef(@ids), undef($count), undef($entry), undef(@aln_entries), undef($nalns), undef($nids), undef(@alignments), undef(@uniq_aln);
+undef(@duplRNAcands), undef($uniqAln_size), undef(@passed_cand), undef($passed_candidates_count);
+undef(@open_bracket_indices), undef(@close_bracket_indices), undef($total_open_brackets), undef($total_close_brackets);
+undef(@uniq_arr), undef($final_hairpins), undef($concat_seq), undef(@broken_seqs);
+undef(@sorted_brokenSeqs), undef($srNo), undef($id), undef($motif_seq), undef(%motif_cands), undef(%uniq_cands), undef(%duplHits);
+undef(@uniq_arr), undef(@duplRNAcands), undef(@sorted_pairs), undef($nesting_pair), undef(@nesting_pairs), undef(%seen);
+undef($structure), undef(@stack), undef(@pairs), undef(@tmp), undef(@components), undef(%visited), undef(%graph);
 
 __END__
 
@@ -469,13 +630,13 @@ perl eval_rnaStruct_v2.pl - Reads an input alignment file in stockholm format, c
 perl eval_rnaStruct_v2.pl [options] infile.sto outfile_cleaned.sto outfile_evaluation.tsv
 
  Options:
-   -e, --extension         Mandatory: any flanking in filename that should be replaced. (e.g., remove .sto)
+   -e, --extension		 Mandatory: any flanking in filename that should be replaced. (e.g., remove .sto)
    --mt, --motif_threshold   Total motif threshold [0.0-1.0]. Default: 0.5
-   -t, --bp_threshold      Each stem in the motif should have x% of base-pairs [0.0-1.0]. Default: 0.75
-   --gc, --bp_gc           Each stem in the motif should have x% of GC/CG base-pairs [0.0-1.0]. Default: 0.30
-   -d, --duplication	   A flag to include duplications in the alignment and all the calculations: 0: duplications OFF - removes duplications and 1: duplications ON, retains duplications in the alignment
-   --help                  Display help message
-   --manual                Display full manual
+   -t, --bp_threshold	  Each stem in the motif should have x% of base-pairs [0.0-1.0]. Default: 0.75
+   --gc, --bp_gc		Each stem in the motif should have x% of GC/CG base-pairs [0.0-1.0]. Default: 0.30
+   -d, --duplication	A flag to include duplications in the alignment and all the calculations: 0: duplications OFF - removes duplications and 1: duplications ON, retains duplications in the alignment
+   --help		Display help message
+   --manual	Display full manual
 
 =head1 DESCRIPTION
 

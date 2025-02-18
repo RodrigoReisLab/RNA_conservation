@@ -43,8 +43,3 @@ In the above example, the structure predicted by LocARNA, one of the stems which
 
 
 Such evaluation is performed on motifs individually and decided manually which motifs are to be taken further.
-
-### Steps after selecting motifs:
-Ideally, once the motifs are obtained, you have either the improved alignment with cacofold or the original alignment obtained from LocARNA after evaluation). This can be used as an improved seed (addition of new homologs to the alignment) and can be used to expand your search for homologs in various other sequences/ genomes of interest (Scaling up). If the covariation does not improve from the previous step or you find that this model is performing worse than what you obtained originally, you can use the same steps on different set of sequences as database to find new homologs to improve seed. This step along with step 5 is therefore iterative (see Figure 1: flowchart) until the user is satisfied with the alignment, the model and the homologs. One approach to test if the models are best, is if no new hit is obtained even after several iterations. 
-
-The best alignment can then be considered seed and all the homologs identified by the seed is called as family. These can be submitted to [Rfam](https://rfam.org/). 

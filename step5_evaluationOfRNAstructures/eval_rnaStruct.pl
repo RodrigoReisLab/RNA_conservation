@@ -1,4 +1,5 @@
 #! usr/bin/perl
+use POSIX;
 
 #Reads 1 input alignment file (stockholm format) and outputs 3 files (cleaned alignment: stockholm, evaluation of each RNA candidate and the total cleaned alignment: tab-separated)
 
@@ -128,44 +129,51 @@ my $passed_candidates_count = 0;
 
 #Evaluating structure
 print "clusterFile\tNseqs\tssConsensus\tss_consLen\tTotal_basepairs\tNseqsPassingEval\tConfidenceOnStructure\n";
-if($total_open_brackets==5)
+if($total_open_brackets>=5 && $total_open_brackets<10)
 {
-	if($ssConsensus =~ /($stem_open_brackets){5}/)
+	if($ssConsensus =~ /($stem_open_brackets){$total_open_brackets}/)
 	{
 		#check for each candidate sequence in the cluster is having the base-pair
 		my $threshold = $total_open_brackets;
 		eval_struct(\@alignments, $threshold);
 	}
+	else
+	{
+		print "$cluster\t$nalns\t$ssConsensus\t$ss_consLen\t$total_open_brackets\t$passed_candidates_count\tLow\n";
+	}
 }
-elsif($total_open_brackets>5)
+elsif($total_open_brackets>=10)
 {
 	#Note only checking for 50% of open brackets, since at SS_cons the total number of open and close brackets are identical
-	my $threshold = $total_open_brackets * 0.5;
+	my $result = $total_open_brackets * 0.5;
+	my $threshold = $result >= int($result) + 0.5 ? ceil($result) : floor($result);
 	eval_struct(\@alignments, $threshold);
 }
 else
-{	
-	$passed_candidates_count = 0;
+{
 	print "$cluster\t$nalns\t$ssConsensus\t$ss_consLen\t$total_open_brackets\t$passed_candidates_count\tLow\n";
 }
 
 #Write passed candidates to stockholm file
-open(STO, ">$ARGV[1]");
-foreach my $t (@top_lines)
+if($#passed_cands > 0)
 {
-        $t =~ s/^\s//;
-	$t= "#=GF SQ $passed_candidates_count\n" if($t =~ /SQ/);
-        print STO $t;
-}
-print STO "#=GF Processed Motif region (trimAlignment.pl) are screened and passed candidates are written \n\n";
-foreach $passed (@passed_cands)
-{
-	print STO "$passed\n";
-}
-print STO "#=GC SS_cons\t$ssConsensus\n";
-print STO "//\n";
+	open(STO, ">$ARGV[1]");
+	foreach my $t (@top_lines)
+	{
+	        $t =~ s/^\s//;
+		$t= "#=GF SQ $passed_candidates_count\n" if($t =~ /SQ/);
+	        print STO $t;
+	}
+	print STO "#=GF ID $cluster\n#=GF CC Processed Motif region (trimAlignment.pl) are screened and passed candidates are written \n\n";
+	foreach $passed (@passed_cands)
+	{
+		print STO "$passed\n";
+	}
+	print STO "#=GC SS_cons\t$ssConsensus\n";
+	print STO "//\n";
 
-close(STO);
+	close(STO);
+}
 
 # sub-routine to evaluate structure
 sub eval_struct
@@ -175,48 +183,109 @@ sub eval_struct
 
 	#check candidate sequence having 50% base-pair
 	open(OUT, ">$ARGV[2]");
-	print OUT "seqID\tbp_threshold\tTotalBPs\t#OpenBPs\t#ClosingBPs\tEvaluation\n";
+	print OUT "seqID\tbp_threshold\tTotalBPs\t#OpenBPs\t#ClosingBPs\t#BPsActuallyForming\tEvaluation\n";
+	$nucl = qr/[ATCGUatcgu]/;
 	foreach $cand (@input_aln)
 	{
 		my ($seq_id, $seq_cand) = split(/\t/, $cand);
-		my $open_brack_char=my $close_brack_char="";
-		my @open_brack_chars, @close_brack_chars;
+		my $open_brack_char = $close_brack_char = "";
+		my @open_brack_chars = @close_brack_chars = @o_stem = @c_stem = ();
 		for my $i (0 .. $#open_bracket_indices)
 		{
 			my $open_brack_loc = $open_bracket_indices[$i];
 			my $close_brack_loc = $close_bracket_indices[$i];
+			my $next_open = $open_bracket_indices[$i+1] if($i+1 <= $#open_bracket_indices);
+			$next_open = $close_bracket_indices[$#open_bracket_indices] if($i+1 > $#open_bracket_indices);
 			$open_brack_char = substr($seq_cand, $open_brack_loc, 1);
 			$close_brack_char = substr($seq_cand, $close_brack_loc, 1);
 
+			if($next_open < $close_brack_loc)
+			{
+				push(@o_stem, $open_brack_loc);
+				push(@c_stem, $close_brack_loc);
+			}
+			else
+			{
+				#Getting the last base-pair of the stem
+				push(@o_stem, $open_brack_loc);
+				push(@c_stem, $close_brack_loc);
+				#Checking the base-pair potential between the nucleotides, this will affect the base-pairs that each sequence can form.
+				$effective_bp_count += eval_stem_loop(\@o_stem,\@c_stem, $seq_cand);
+				undef(@o_stem), undef(@c_stem);
+
+			}
+
+			push(@o_nucl, $open_brack_char) if($open_brack_char =~ $nucl);
+			push(@c_nucl, $close_brack_char) if($close_brack_char =~ $nucl);
 			push(@open_brack_chars, $open_brack_char);
 			push(@close_brack_chars, $close_brack_char);
 		}
-		$nucl = qr/[ATCGUatcgu]/;
-		my @o_nucl = grep { $_ =~ $nucl } @open_brack_chars;
-		my @c_nucl = grep { $_ =~ $nucl } @close_brack_chars;
 
 		my $o_nucl_count = scalar @o_nucl;
 		my $c_nucl_count = scalar @c_nucl;
 
+		my $nucl_count = $o_nucl_count < $c_nucl_count ? $o_nucl_count : $c_nucl_count;
 		#Check for sequences having $threshold base-pairs and write to output.
-		if($o_nucl_count>=$bp_threshold and $c_nucl_count>=$bp_threshold)
+		if($effective_bp_count>=$bp_threshold)
 		{
-			print OUT "$seq_id\t$bp_threshold\t$total_open_brackets\t$o_nucl_count\t$c_nucl_count\tPassed\n";
+			print OUT "$seq_id\t$bp_threshold\t$total_open_brackets\t$o_nucl_count\t$c_nucl_count\t$effective_bp_count\tPassed\n";
 			#Write the sequence to stockholm file
 			push(@passed_cands, $cand);
 		}
 		else
 		{
-			print OUT "$seq_id\t$bp_threshold\t$total_open_brackets\t$o_nucl_count\t$c_nucl_count\tFail\n";
+			print OUT "$seq_id\t$bp_threshold\t$total_open_brackets\t$o_nucl_count\t$c_nucl_count\t$effective_bp_count\tFail\n";
 		}
-		undef(@open_brack_chars), undef(@close_brack_chars), undef(@o_nucl), undef(@c_nucl);
+		undef(@open_brack_chars), undef(@close_brack_chars), undef(@o_nucl), undef(@c_nucl), undef(@motif), undef($effective_bp_count);
 	}
 	close(OUT);
 
 	# Checking if the alignment has enough candidates to call it an alignment
 	$passed_candidates_count = $#passed_cands + 1;
 	print "$cluster\t$nalns\t$ssConsensus\t$ss_consLen\t$total_open_brackets\t$passed_candidates_count\tHigh\n" if($passed_candidates_count >= 10);
-	print "$cluster\t$nalns\t$ssConsensus\t$ss_consLen\t$total_open_brackets\t$passed_candidates_count\tMid\n" if($passed_candidates_count < 10);
+	print "$cluster\t$nalns\t$ssConsensus\t$ss_consLen\t$total_open_brackets\t$passed_candidates_count\tMid\n" if($passed_candidates_count>=7 && $passed_candidates_count < 10);
+	print "$cluster\t$nalns\t$ssConsensus\t$ss_consLen\t$total_open_brackets\t$passed_candidates_count\tLow\n" if($passed_candidates_count < 7);
+
+}
+
+sub eval_stem_loop
+{
+	my ($open_ref, $close_ref, $seq) = @_;
+	$bp_passed=0;
+	for my $i (0 .. $#{$open_ref})
+	{
+		my $open_index = $open_ref->[$i];
+		my $close_index = $close_ref->[$#{$close_ref} - $i];
+
+		$open_char = substr($seq, $open_index, 1);
+		$close_char = substr($seq, $close_index, 1);
+
+		#Checking base-pair potential
+		if(($open_char eq 'A' && $close_char eq 'U') || ($open_char eq 'U' && $close_char eq 'A') || ($open_char eq 'C' && $close_char eq 'G') || ($open_char eq 'G' && $close_char eq 'C') || ($open_char eq 'U' && $close_char eq 'G') || ($open_char eq 'G' && $close_char eq 'U'))
+		{
+			$bp_passed += 1;
+		}
+	}
+
+	#Evaluating if each stem of the RNA has 75% structure
+	my $result = $#{$open_ref} * 0.75;
+	my $stem_thresh = $result >= int($result) + 0.5 ? ceil($result) : floor($result);
+
+	$bp_passed = 0 if($bp_passed < $stem_thresh);
+	if($bp_passed<3)
+	{
+		$bp_passed = 0;
+	}
+	elsif($bp_passed==3)
+	{
+		$open_last = $open_ref->[-1];
+		$close_first = $close_ref->[0];
+		my $loop_nucl = $close_first - ($open_last+1);
+		my $loop=substr($seq, $open_last+1, $loop_nucl);
+		$loop =~ s/-//g;
+		$bp_passed = 0 if(length($loop) > 5);
+	}
+	return($bp_passed);
 
 }
 undef($ssConsensus), undef(@alignments), undef(@aln), undef(@open_bracket_indices), undef(@close_bracket_indices), undef(@passed_cands);

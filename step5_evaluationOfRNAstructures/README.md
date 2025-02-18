@@ -64,4 +64,4 @@ Note: TotalBPs, #OpenBPs, #ClosingBPs are calculated from the secondary structur
 
 R-scape is in the docker container and thus can be used with singularity. _-s_ option performs the two-tailed test and writes the output to a folder 'motif_gc15_twoTest_rscape_out'. This folder should be created before implementing R-scape. To automate this process, use the script 'rscape_eval_twoTest_gc15.sh' as a guide. 
 
-Motifs with minimum 5% covariation can be considered further. The alignment (motif_cleaned.sto) can be considered as a reliable alignment and used further for the next step.
+The alignment (motif_cleaned.sto) can be considered as a reliable alignment and used further for the next step.

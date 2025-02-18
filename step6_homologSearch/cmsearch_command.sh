@@ -14,16 +14,19 @@
 modelPath="/storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/v3_afterAnalysesOfLocarnaHits/seedAlns";
 PD=$(pwd);
 list="high_mid_clustersFrom_v3.txt";
-clusterName=$(awk -v row="${SLURM_ARRAY_TASK_ID}" 'NR==row {print $0}' "$list")
+#clusterName=$(awk -v row="${SLURM_ARRAY_TASK_ID}" 'NR==row {print $0}' "$list")
 
 #Commands
-date
-echo -e "Path to models: ${modelPath} \n";
-echo -e "Searching calibrated model: ${clusterName} against NCBI 3800 chloroplast genomes\n";	
+for clusterName in `cat $list`
+do
+	date
+	echo -e "Path to models: ${modelPath} \n";
+	echo -e "Searching calibrated model: ${clusterName} against NCBI 3800 chloroplast genomes\n";	
 
-#cmsearch command
-singularity exec -B ${PD}:/input,${modelPath}:/models /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.sif bash -c "
-	cmsearch -g --cpu ${SLURM_CPUS_PER_TASK} -E 0.0001 /models/${clusterName}_motif_cleaned_v3.cm /input/allFasta_oneLine.fa > /input/${clusterName}_hits.txt
-	"
-echo -e "Homolog search completed for motif represented by cluster: ${clusterName}\n";
-date
+	#cmsearch command
+	singularity exec -B ${PD}:/input,${modelPath}:/models /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.sif bash -c "
+		cmsearch -g -E 0.0001 /models/${clusterName}_motif_cleaned_v3.cm /input/allFasta_oneLine.fa > /input/${clusterName}_hits.txt
+		"
+	echo -e "Homolog search completed for motif represented by cluster: ${clusterName}\n";
+	date
+done

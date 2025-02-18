@@ -18,20 +18,23 @@ date
 PD=`pwd`;
 modelPath="/storage/workspaces/ips_reislab/reislab/mehta/chloro_bayer/v3_afterAnalysesOfLocarnaHits/seedAlns"
 list="high_mid_clustersFrom_v3.txt";
-clusterName=$(awk -v row="${SLURM_ARRAY_TASK_ID}" 'NR==row {print $0}' "$list")
+#clusterName=$(awk -v row="${SLURM_ARRAY_TASK_ID}" 'NR==row {print $0}' "$list")
 
-if [ -f ${PD}/${clusterName}_hits.txt ]
-then
-	#Reformatting Infernal ouput
-	echo -e "Processing Infernal output to get parseable findings for ${clusterName}\n";
-	singularity exec -B $PD:/input,$modelPath:/models /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.sif bash -c "
-      	perl /home/usr/selected_scripts_riboswitch_method/cmsearch_reformatv1_1.pl -s ${clusterName}_scores.tab /input/${clusterName}_hits.txt /input/${clusterName}_hits.fna && \
-       	echo -e 'Using cmalign to align identified hits to the cluster model: ${clusterName}\n' && \
-       	cmalign -o /input/${clusterName}_hits.sto /models/${clusterName}_motif_cleaned_v3.cm /input/${clusterName}_hits.fna && \
-       	echo -e 'Writing an html output for stockholm(.sto) alignment representing hits from cluster: ${clusterName}\n' && \
-       	perl /home/usr/selected_scripts_riboswitch_method/stockholm_to_html.pl /input/${clusterName}_hits.sto /input/${clusterName}_hits.html
-        "
-	echo -e "Hits identified from Infernal are processed and output as scores (.tab), fasta (.fna), stockholm (.sto) and colored alignment view (.html) for ${clusterName}\n";
-	date
-fi
+for clusterName in `cat $list`;
+do
+	if [ -f ${PD}/${clusterName}_hits.txt ]
+	then
+		#Reformatting Infernal ouput
+		echo -e "Processing Infernal output to get parseable findings for ${clusterName}\n";
+		singularity exec -B $PD:/input,$modelPath:/models /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.sif bash -c "
+	      	perl /home/usr/selected_scripts_riboswitch_method/cmsearch_reformatv1_1.pl -s ${clusterName}_scores.tab /input/${clusterName}_hits.txt /input/${clusterName}_hits.fna && \
+	       	echo -e 'Using cmalign to align identified hits to the cluster model: ${clusterName}\n' && \
+	       	cmalign -o /input/${clusterName}_hits.sto /models/${clusterName}_motif_cleaned_v3.cm /input/${clusterName}_hits.fna && \
+	       	echo -e 'Writing an html output for stockholm(.sto) alignment representing hits from cluster: ${clusterName}\n' && \
+	       	perl /home/usr/selected_scripts_riboswitch_method/stockholm_to_html.pl /input/${clusterName}_hits.sto /input/${clusterName}_hits.html
+	        "
+		echo -e "Hits identified from Infernal are processed and output as scores (.tab), fasta (.fna), stockholm (.sto) and colored alignment view (.html) for ${clusterName}\n";
+		date
+	fi
+done
 

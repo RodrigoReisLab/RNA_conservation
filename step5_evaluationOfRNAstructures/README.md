@@ -1,11 +1,11 @@
 # This step is to evaluate the output alignment from step 4 confirming the sequences in the alignment are forming the structure.
 
-This step is divided into multiple sub-steps and it includes the following:
-i. _trim the alignment_ - alignment from locarna will have the input sequence length (eg. if the input sequences are 100nt - alignment will contain 100nt even if structure is formed of 30nt). Thus, the trimming will help get the relevant 30nt structure with 10-column flank (columns refers to the positions in an alignment) on both sides of the structure.
-ii.  _evaluate the alignment_ - the trimmed alignment is taken to evaluate using in-house method RNA-ScoRE. Here, each sequence is checked if it can form the structure proposed by LocARNA. It checks for individual base-pairing capability, sequence GC content, sequence redundancy and overall motif formation by the sequence and marks them as 'Passed' or 'Failed' based on these criteria. Number of 'Passed' sequences decide whether the alignment is reliable and are ranked as 'High' (#seqs ≥10), 'Mid' (7 < #seqs > 9) or 'Low' (#seqs < 7).
-iii. _check for covariation_ - Using R-scape two-tailed test (-s) we check if the alignment marked 'High' or 'Mid' carries any power for covariation. This tool also allows us to check whether the RNAs in the alignment can form conserved alternate structure - if it forms the same structure, the reliability of the motif increases.
+This step is divided into multiple sub-steps and it includes the following:  
+i. _trim the alignment_ - alignment from locarna will have the input sequence length (eg. if the input sequences are 100nt - alignment will contain 100nt even if structure is formed of 30nt). Thus, the trimming will help get the relevant 30nt structure with 10-column flank (columns refers to the positions in an alignment) on both sides of the structure.  
+ii.  _evaluate the alignment_ - the trimmed alignment is taken to evaluate using in-house method RNA-ScoRE. Here, each sequence is checked if it can form the structure proposed by LocARNA. It checks for individual base-pairing capability, sequence GC content, sequence redundancy and overall motif formation by the sequence and marks them as 'Passed' or 'Failed' based on these criteria. Number of 'Passed' sequences decide whether the alignment is reliable and are ranked as 'High' (#seqs ≥10), 'Mid' (7 < #seqs > 9) or 'Low' (#seqs < 7).  
+iii. _check for covariation_ - Using R-scape two-tailed test (-s) we check if the alignment marked 'High' or 'Mid' carries any power for covariation. This tool also allows us to check whether the RNAs in the alignment can form conserved alternate structure - if it forms the same structure, the reliability of the motif increases.  
 
-Thus, at the end we will have reliable alignment that we can take forward to the next step. 
+Thus, at the end we will have reliable alignment that we can take forward to the next step.  
 
 ### Commands to execute these steps:
 i. _trim the alignment_
@@ -18,4 +18,13 @@ ii. _evaluate the alignment_
 
 	perl eval_rnaStruct_v3.pl -e _motif.sto -d 0 --mt 0.5 -t 0.75 --gc 0.30 motif_trimmed.sto motif_cleaned.sto motif_evaluated.tsv >> allClusters_evaluation.tsv
 
+<pre>
+	'e|extension=s'		=> \$ext, 		#any flanking in filename that should be replaced. mandatory to remove .sto from extension - to obtain clean output filename
+	'mt|motif_threshold=f'	=> \$motif_thresh, 	#total motif threshold [0.0-1.0] => set to 0.5 for evaluation/cleaning step
+	't|bp_threshold=f'	=> \$bp_thresh, 	#each stem in the motif should have x% of base-pairs [0.0-1.0] => set to 0.75 for evaluation/cleaning step
+	'gc|bp_gc=f'		=> \$gc_bp_thresh, 	#each stem in the motif should have x% of GC/CG base-pairs [0.0-1.0] -> set to 0.30
+	'd|duplication=i'	=> \$dupl_flag,		#A flag to include duplications in the alignment and all the calculations: 0: duplications OFF - removes duplicationsand 1: duplications ON, retains duplications in the alignment
+	'h|help'		=> \$help,
+	'manual'		=> \$man
+</pre>
 

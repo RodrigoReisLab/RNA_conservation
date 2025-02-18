@@ -12,16 +12,16 @@ Thus, at the end we will have reliable alignment that we can take forward to the
 ### Commands to execute these steps:
 i. _trim the alignment_
 
-	perl trimAlignment.pl result.stk ${i}_motif.sto ${i}_motif.fasta ${i}_motif.afa
+	perl trimAlignment.pl result.stk motif_trimmed.sto motif_trimmed.fasta motif_trimmed.afa
 
 Here, it takes the output alignment from locARNA step (result.stk) and writes 3 output files which can be used for different tools (eg: .sto - Rscape, Infernal; .fasta - RNAz; .afa - SQUARNA).  
 
 ii. _evaluate the alignment_
 
-	perl eval_rnaStruct.pl -e _motif.sto -d 0 --mt 0.5 -t 0.75 --gc 0.30 motif_trimmed.sto motif_cleaned.sto motif_evaluated.tsv >> allClusters_evaluation.tsv
+	perl eval_rnaStruct.pl -e _trimmed.sto -d 0 --mt 0.5 -t 0.75 --gc 0.30 motif_trimmed.sto motif_cleaned.sto motif_evaluated.tsv >> allClusters_evaluation.tsv
 
 <pre>
-	'e|extension=s'		=> \$ext, 		#any flanking in filename that should be replaced. mandatory to remove .sto from extension - to obtain clean output filename
+	'e|extension=s'		=> \$ext, 		#any flanking in filename that should be replaced. mandatory to remove .sto from extension - to obtain clean output filename (Here, in this example '_trimmed.sto' from input filename (motif_trimmed.sto) has to be removed.
 	'mt|motif_threshold=f'	=> \$motif_thresh, 	#total motif threshold [0.0-1.0] => set to 0.5 for evaluation/cleaning step
 	't|bp_threshold=f'	=> \$bp_thresh, 	#each stem in the motif should have x% of base-pairs [0.0-1.0] => set to 0.75 for evaluation/cleaning step
 	'gc|bp_gc=f'		=> \$gc_bp_thresh, 	#each stem in the motif should have x% of GC/CG base-pairs [0.0-1.0] -> set to 0.30
@@ -32,25 +32,23 @@ ii. _evaluate the alignment_
 
 It will also output saying if the input alignment is ranked High, Mid or Low on STDOUT. This can be written to any output file (eg: allClusters_evaluation.tsv)
 
+Passed sequences ranked High and Mid will be written in stockholm alignment format to the output file (eg: 'motif_cleaned.sto')
 The tab-separated output file 'motif_evaluated.tsv' will contain information of each sequence in the alignment has passed or failed. The output will contain columns describing the length of the sequence, GC content of the sequence, Threshold deciding how many base-pairs for this motif should be formed, number of total base-pairs, number of opening and closing base-pairs (individual brackets marking the positions as base-paired), percentage of hairpin forming for each stem-loop, number of base-pairs actually formed by the sequence, if there are identical sequences (redundant) and finally if the sequence has passed the evaluation. An output example below shows this motif is a 2 stem-loop structure with 10 base-pairs of which a minimum 5bp should be formed by any sequence.  
 Note: TotalBPs, #OpenBPs, #ClosingBPs are calculated from the secondary structure of the alignment (#SS_cons line). Total BPs - 1open and 1 corresponding close bracket - considered as 1basepair. 
 
-<pre>
-seqID	length	GCcontent	bp_threshold	TotalBPs	#OpenBPs	#ClosingBPs	HairpinBPs_per	#BPsActuallyForming	RedundantRNAcandidates	Evaluation
-NC_035006.1_306_53550_53800r-53986_54172r	94	41	5	10	10	10	60.00,100.00,	5		Passed
-NC_030064.1_279_48825_49075r-49261_49447r	94	33	5	10	10	10	60.00,60.00,	0		Fail
-NC_029813.1_283_49525_49775r-49961_50147r	96	37	5	10	10	10	40.00,60.00,	0		Fail
-NC_041531.1_300_52500_52750r-52936_53122r	96	36	5	10	10	10	60.00,40.00,	0		Fail
-NC_041539.1_294_51450_51700r-51886_52072r	94	43	5	10	10	10	100.00,100.00,	10		Passed
-NC_036977.1_288_50400_50650r-50836_51022r	94	40	5	10	10	10	80.00,100.00,	9		Passed
-NC_034990.1_315_55125_55375r-55561_55747r	94	41	5	10	10	10	80.00,100.00,	9		Passed
-NC_039465.1_65_11375_11625r-11811_11997r	94	39	5	10	10	10	100.00,100.00,	10		Passed
-NC_039924.1_282_49350_49600-49786_49972	104	34	5	10	10	10	80.00,60.00,	4		Fail
-NC_034287.1_275_48125_48375r-48561_48747r	101	42	5	10	8	10	40.00,0.00,	0		Fail
-NC_036052.1_290_50750_51000r-51186_51372r	94	39	5	10	10	10	100.00,100.00,	10		Passed
-NC_040984.1_318_55650_55900r-56086_56272r	94	37	5	10	10	10	80.00,100.00,	9	NC_035566.1_301_52675_52925r-53111_53297r	Passed
-NC_044106.1_304_53200_53450r-53636_53822r	94	39	5	10	10	10	100.00,100.00,	10		Passed
-NC_041266.1_288_50400_50650r-50836_51022r	93	40	5	10	10	10	80.00,80.00,	8		Passed
-</pre>
-
-
+| seqID| length | GCcontent | bp_threshold | TotalBPs | #OpenBPs | #ClosingBPs | HairpinBPs_per | #BPsActuallyForming| RedundantRNAcandidates|Evaluation
+|:-------------------------------------------:|:------:|:---------:|:------------:|:--------:|:--------:|:-----------:|:--------------:|:--------------------:|:-----------------------------------------:|:--------:|
+| NC_035006.1_306_53550_53800r-53986_54172r||94|41|5|10|10|10|60.00,100.00,|5|Passed
+| NC_030064.1_279_48825_49075r-49261_49447r||94|33|5|10|10|10|60.00,60.00,|0|Fail
+| NC_029813.1_283_49525_49775r-49961_50147r||96|37|5|10|10|10|40.00,60.00,|0|Fail
+| NC_041531.1_300_52500_52750r-52936_53122r||96|36|5|10|10|10|60.00,40.00,|0|Fail
+| NC_041539.1_294_51450_51700r-51886_52072r||94|43|5|10|10|10|100.00,100.00,|10|Passed
+| NC_036977.1_288_50400_50650r-50836_51022r||94|40|5|10|10|10|80.00,100.00,|9|Passed
+| NC_034990.1_315_55125_55375r-55561_55747r||94|41|5|10|10|10|80.00,100.00,|9|Passed
+| NC_039465.1_65_11375_11625r-11811_11997r||94|39|5|10|10|10|100.00,100.00,|10|Passed
+| NC_039924.1_282_49350_49600-49786_49972 104 |34|5|10|10|10|80.00,60.00,|4|Fail
+| NC_034287.1_275_48125_48375r-48561_48747r||101|42|5|10|8|10|40.00,0.00,|0|Fail
+| NC_036052.1_290_50750_51000r-51186_51372r||94|39|5|10|10|10|100.00,100.00,|10|Passed
+| NC_040984.1_318_55650_55900r-56086_56272r||94|37|5|10|10|10|80.00,100.00,|9|NC_035566.1_301_52675_52925r-53111_53297r|Passed
+| NC_044106.1_304_53200_53450r-53636_53822r||94|39|5|10|10|10|100.00,100.00,|10|Passed
+| NC_041266.1_288_50400_50650r-50836_51022r||93|40|5|10|10|10|80.00,80.00,|8|Passed

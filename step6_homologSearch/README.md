@@ -23,6 +23,8 @@ Additionally, R-scape with _--cacofold_ option can provide an additional check o
 **RNA structure does not change**  
 
 **RNA structure is similar**   
-| ![locARNA predicted structure](NC_036423.1_1_175_425r_gc15_rscape.R2R.sto.pdf) | ![R-scape cacofold predicted structure](NC_036423.1_1_175_425r_gc15_rscape.cacofold.R2R.sto.pdf) |
+| ![locARNA predicted structure](NC_036423.1_1_175_425r_gc15_rscape.R2R.sto.svg) | ![R-scape cacofold predicted structure](NC_036423.1_1_175_425r_gc15_rscape.cacofold.R2R.sto.svg) |
 |-------------------------------------------------|-----------------------------------------------------|
+
+
 **RNA structure is very different**

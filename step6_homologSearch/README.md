@@ -2,7 +2,7 @@
 
 Here, the initial alignments (motif_cleaned.sto - ranked High or Mid) are tested if the alignments are capable of finding itself and other RNA structure homologs. This is because each alignment can act as a seed to find more of its kind (family). If it is capable of finding itself and others, than the alignment is reliable and can be added with new homologs to increase the reliability of the seeds (improving the seeds/ models). If seeds fail to find other homologs or themselves, than the seeds are not reliable, therefore making the motif unreliable.
 
-**! Disclaimer:** From this step onwards, we perform the steps iteratively including Step 5 to obtain clean and reliable alignment, search models and homologs.  
+**! Disclaimer:** From this step onwards, we perform the steps iteratively to obtain clean and reliable alignment, search models and homologs. We use step 5 and step 7 to obtain reliable alignments and structure motifs.
 
 We perform this step using [Infernal v1.1.4](http://eddylab.org/infernal/), [R-scape](https://github.com/EddyRivasLab/R-scape), [custom reformatting scripts](https://barricklab.org/twiki/bin/view/Lab/SupplementRiboswitchPrediction_v1) and in-house RNA-SCoRE tools. Infernal, R-scape and custom reformatting scripts are part of the Docker container.
 

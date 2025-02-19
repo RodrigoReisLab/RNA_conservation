@@ -45,9 +45,9 @@ The script 'nhmmer_local_job.sh' can then be used as a guide to perform all the 
 
 As a sanity check, add the locarna predicted structure to the alignment. Since the sequences were already from a structure based alignment, all the positions in the hmmer-derived alignment with gaps are added with gaps in the LocARNA predicted structure. This is performed using the script 'addStructToHMMERaln.pl'. Make sure the representative .sto file is not a multi-line (wrapped) sequence but in a single line. Else the program will not assign the structure correctly.  
 
-After adding the structure perform R-scape with two-tailed test (_-s_ option). Lets call this as _locarnaAddedStructureToHmmAln_. Compare the structures _nhmmer_Rscape_cacfold_structure_ and _locarnaAddedStructureToHmmAln_. Use the same logic as previously described in Step 6.iv and you will obtain reliable alignment compatible with structure. Additionally, if the covariation is lost in this process, the structures may become less reliable and hence should be discarded.
+After adding the structure perform R-scape with two-tailed test (_-s_ option). Lets call this as _locarnaAddedStructureToHmmAln_. Compare the structures _nhmmer_Rscape_cacfold_structure_ and _locarnaAddedStructureToHmmAln_. Use the same logic as previously described in Step 6.iv and you will obtain reliable alignment compatible with structure. Additionally, if the covariation is lost in this process, the structures may become less reliable and hence should be discarded. At last you select the hmmer alignment with either the cacofold structure or added with locARNA structure as the model for the new motif.
 
-###This way, with all the steps scrutinizing the sequences, the structure and the compatibility between sequence and structure, the possibility of obtaining reliable models increases and helps in predicting high-confidence de novo motifs in the sequences of interest.
+### This way, with all the steps scrutinizing the sequences, the structure and the compatibility between sequence and structure, the possibility of obtaining reliable models increases and helps in predicting high-confidence _de novo_ motifs in the sequences of interest.
 
 
 ### Steps after selecting motifs:

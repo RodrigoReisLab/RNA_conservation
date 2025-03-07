@@ -1,0 +1,20 @@
+name: mmseq2env
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=5.1=1_gnu
+  - bzip2=1.0.8=h7b6447c_0
+  - ca-certificates=2023.08.22=h06a4308_0
+  - gawk=5.1.0=h7b6447c_0
+  - libgcc-ng=11.2.0=h1234567_1
+  - libgomp=11.2.0=h1234567_1
+  - libidn2=2.3.4=h5eee18b_0
+  - libstdcxx-ng=11.2.0=h1234567_1
+  - libunistring=0.9.10=h27cfd23_0
+  - mmseqs2=13.45111=h95f258a_1
+  - openssl=3.0.11=h7f8727e_2
+  - wget=1.21.4=h251f7ec_1
+  - zlib=1.2.13=h5eee18b_0
+prefix: /storage/homefs/dm23z608/.conda/envs/mmseq2env

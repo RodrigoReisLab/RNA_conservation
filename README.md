@@ -1,6 +1,6 @@
 #Pipeline to predict conserved RNA structures in genomes or sequences of interest.
 
-The pipeline is in 6-7 steps starting from input of sequences. This can either be entire genomes or sequences of choice (eg. UTR regions, RNAs from transcriptomes). Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
+The pipeline is in 7 steps starting from input of sequences. Sequences can either be whole genome or sequences of choice (eg. UTR regions, RNA sequences from transcriptomes). Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
 
 <div align="center">
 <img src="pipeline.png", width="500px">

@@ -1,28 +1,28 @@
-#Pipeline to predict conserved RNA structures in genomes or sequences of interest.
+# This folder contains miscellaneous scripts after running the pipeline.
 
-The pipeline is in 6-7 steps starting from input of sequences. This can either be entire genomes or sequences of choice (eg. UTR regions, RNAs from transcriptomes). Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
+One of the follow-up steps is to see where the RNAs are located in the sequences/ genomes of interest. Thus, a bed file will help with visualizing RNAs in IGV or any gene tracks viewing program.
 
-<div align="center">
-<img src="pipeline.png", width="500px">
-</div>
-Figure 1: Overview of the pipeline. Each of the box are color-coded and marked to help identify the steps to be followed. Each of the steps are dispensable depending on which step user wishes to perform. Scripts and tools relevant to each step are in the respective directories.
+Thus, the script 'cutsv2bed.pl' will help with converting the file. Here, the motif_evaluated.tsv is taken as input along with corresponding motif_scores.tab and the name of the genome ID (preferably the first column in the motif_evaluated.tsv - either the genome ID or the sequence ID). Note this should not contain co-ordinates. 
+
+e.g. it can be any one of the following:   
+NC_000932   
+scaffold_1    
+scaffold_2    
 
 
-### For the entire pipeline, following containers and environments files will be easy to use.
+The script 'cutsv2bed_job.sh' can be used as a guide to execute the perl script. The output BED file (example shown below) is compatible to view in IGV.
 
-1. rnatools Docker file -  easy access to tools like Vienna RNA package, LocARNA, R-scape and HMMER. It can be taken from [dockerhub.](https://hub.docker.com/r/dollycm/rnatools) and use the following commands to get the container. 
- You can use either docker or singularity [Recommended] to pull the image:
+<pre>
+track name="RNAmotifs" description="RNA motifs identified through extensive computational analyses" visibility=2 colorByStrand="200,90,222 238,187,250" ggfTags=on
+NC_000932.1	44865	44913	RNAcoords=NC_000932.1/44865-44913,RNAstrand=minus,SequenceRep=NC_056089.1/44356-44404_-1,model=NC_009259.1_316_55300_55550r,bit_score=50.5,E-value=9.8e-06,Organism=Arabidopsis thaliana 	0	-	44865	44913
+NC_000932.1	7786	7837	RNAcoords=NC_000932.1/7786-7837,RNAstrand=plus,SequenceRep=NC_033499.1/7718-7769_1,model=NC_009259.1_316_55300_55550r,bit_score=70.3,E-value=6.3e-10,Organism=Arabidopsis thaliana 	0	+	7786	7837
+NC_000932.1	139773	139821	RNAcoords=NC_000932.1/139773-139821,RNAstrand=plus,SequenceRep=NC_066122.1/172374-172422_-1,model=NC_041414.1_478_83650_83900r,bit_score=51.1,E-value=6.3e-06,Organism=Arabidopsis thaliana 	0	+	139773	139821
 
-        docker pull dollycm/rnatools:v2
-        
-     OR
-
-        singularity pull docker://dollycm/rnatools:v2
-
-2. mmseqs2 YAML - for clustering of sequences. YAML file is provided in the respective Step2 clustering folder
-
-3. seqtk YAML - for basic sequence manipulations, including reverse complement input sequences. YAML file is provided in the respective Step2 clustering folder.
-
-StepMisc folder contains miscellaneous steps to use the motifs for analyses in obtaining phylogenetic spread and gene context.
-
-**Note:** Some of the job bash scripts have commands for SLURM based execution. If executing the scripts on local machine, directly run the programs as normal bash scripts. The SLURM commands will not affect the performance of the scripts.
+</pre>
+The output BED file is a tab delimited file containing 
+	- Column 1 contains Genome ID (This should be identical to the heaer of the genome sequence file loaded in IGV); 
+	- Column 2 and 3 containing the RNA co-ordinates 
+	- Column 4 containing the description of the RNA. It includes information such as the model from which this motif was identified, the raw bit-score given by cmsearch (how close the homolog is to the model; higher score represents a good homolog) and the e-value (whether the RNA homolog predicted is random, lower the e-value - far from 0, less chance of it being a random hit).
+	- Column 5 is supposed to be the score for visualization. Since we do not have any score, we mark it 0
+	- Column 6 is the strand where the RNA motif occurs
+	- Column 7 and Column 8 are the RNA co-ordinates again (ideally it is used for coding vs non-coding regions like UTRs in the transcripts, which we do not have for RNA motifs).

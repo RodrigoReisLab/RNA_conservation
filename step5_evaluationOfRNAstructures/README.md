@@ -18,7 +18,7 @@ Here, it takes the output alignment from locARNA step (result.stk) and writes 3 
 
 **ii. _evaluate the alignment_**
 
-	perl eval_rnaStruct.pl -e _trimmed.sto -d 0 --mt 0.5 -t 0.75 --gc 0.30 motif_trimmed.sto motif_cleaned.sto motif_evaluated.tsv >> allClusters_evaluation.tsv
+	perl RNA-SCoRE.pl -e _trimmed.sto -d 0 --mt 0.5 -t 0.75 --gc 0.30 motif_trimmed.sto motif_cleaned.sto motif_evaluated.tsv >> allClusters_evaluation.tsv
 
 <pre>
 	'e|extension=s'		=> \$ext, 		#any flanking in filename that should be replaced. mandatory to remove .sto from extension - to obtain clean output filename (Here, in this example '_trimmed.sto' from input filename (motif_trimmed.sto) has to be removed.

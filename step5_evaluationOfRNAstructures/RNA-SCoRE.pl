@@ -623,11 +623,11 @@ __END__
 
 =head1 NAME
 
-perl eval_rnaStruct_v2.pl - Reads an input alignment file in stockholm format, compares each sequence/ hit in the alignment with the consensus structure and evaluates if the sequence/hit can form the secondary structure. Evaluates at each hairpin (stem-loop), the total motif and the entire alignment. The estimates used for evaluation are output to evaluation.tsv (tab-separated) file for each cluster, a cleaned alignment (removing redundant and failed sequeces/ hits) and overall cluster confidence of alignment and other features is written to standard output.
+perl RNA-SCoRE.pl - Reads an input alignment file in stockholm format, compares each sequence/ hit in the alignment with the consensus structure and evaluates if the sequence/hit can form the secondary structure. Evaluates at each hairpin (stem-loop), the total motif and the entire alignment. The estimates used for evaluation are output to evaluation.tsv (tab-separated) file for each cluster, a cleaned alignment (removing redundant and failed sequeces/ hits) and overall cluster confidence of alignment and other features is written to standard output.
 
 =head1 SYNOPSIS
 
-perl eval_rnaStruct_v2.pl [options] infile.sto outfile_cleaned.sto outfile_evaluation.tsv
+perl RNA-SCoRE.pl [options] infile.sto outfile_cleaned.sto outfile_evaluation.tsv
 
  Options:
    -e, --extension		 Mandatory: any flanking in filename that should be replaced. (e.g., remove .sto)

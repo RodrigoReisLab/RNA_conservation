@@ -1,0 +1,14 @@
+name: seqtk_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=2_gnu
+  - libgcc=14.1.0=h77fa898_1
+  - libgcc-ng=14.1.0=h69a702a_1
+  - libgomp=14.1.0=h77fa898_1
+  - seqtk=1.2=1
+  - zlib=1.2.11=h36c2ea0_1011
+prefix: /storage/homefs/dm23z608/.conda/envs/seqtk_env

@@ -20,16 +20,6 @@ Here, it takes the output alignment from locARNA step (result.stk) and writes 3 
 
 	perl RNA-SCoRE.pl -e _trimmed.sto -d 0 --mt 0.5 -t 0.75 --gc 0.30 motif_trimmed.sto motif_cleaned.sto motif_evaluated.tsv >> allClusters_evaluation.tsv
 
-<pre>
-	'e|extension=s'		=> \$ext, 		#any flanking in filename that should be replaced. mandatory to remove .sto from extension - to obtain clean output filename (Here, in this example '_trimmed.sto' from input filename (motif_trimmed.sto) has to be removed.
-	'mt|motif_threshold=f'	=> \$motif_thresh, 	#total motif threshold [0.0-1.0] => set to 0.5 for evaluation/cleaning step (column labeled bp_threshold in output file)
-	't|bp_threshold=f'	=> \$bp_thresh, 	#each stem in the motif should have x% of base-pairs [0.0-1.0] => set to 0.75 for evaluation/cleaning step. (column labeled HairpinBPs_per in output file)
-	'gc|bp_gc=f'		=> \$gc_bp_thresh, 	#each stem in the motif should have x% of GC/CG base-pairs [0.0-1.0] -> set to 0.30
-	'd|duplication=i'	=> \$dupl_flag,		#A flag to include duplications in the alignment and all the calculations: 0: duplications OFF - removes duplicationsand 1: duplications ON, retains duplications in the alignment
-	'h|help'		=> \$help,
-	'manual'		=> \$man
-</pre>
-
 It will also output saying if the input alignment is ranked High, Mid or Low on STDOUT. This can be written to any output file (eg: allClusters_evaluation.tsv). If the motif consists of ≤10 base-pairs (ie. total bps ≤ 10) than it is mandatory that the sequence forms all base-pairs. If it does not, the stem-loop is discarded and hence in the evaluation, #BPsActuallyForming will be set to 0.
 
 Passed sequences ranked High and Mid will be written in stockholm alignment format to the output file (eg: 'motif_cleaned.sto')

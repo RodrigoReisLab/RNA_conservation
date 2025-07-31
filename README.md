@@ -1,6 +1,13 @@
-#Pipeline to predict conserved RNA structures in genomes or sequences of interest.
+#Genome-wide discovery of conserved RNA secondary structures
+Author: [Dolly Mehta](https://orcid.org/0000-0002-4435-5183)
+This pipeline was created to find conserved RNA structures in genomes or sequence datasets (eg. UTR regions, RNAs from transcriptomes).
 
-The pipeline is in 6-7 steps starting from input of sequences. This can either be entire genomes or sequences of choice (eg. UTR regions, RNAs from transcriptomes). Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
+We have applied this pipeline to plastid genomes [preprint_soon](https://www.biorxiv.org/).
+
+##Pipeline to predict conserved RNA structures in genomes or sequences of interest.
+
+The pipeline is in 6-7 steps starting from input of sequences. Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
+We recommend the use of high performance computing cluster (HPC). Our scripts were made for a SLURM-managed HPC, but they can easily be adaptated to others.
 
 <div align="center">
 <img src="pipeline.png", width="500px">

@@ -2,7 +2,7 @@
 
 Here we use the list of clusters which passed RNALalifold step and find what the common structure that the sequences share. We perform this using LocARNA which performs sequence and structure guided predictions. This is the crucial and the first step to obtain the conserved structure between sequences.
 
-The script 'locarnap_array_job.sh' can be used as a guide to perform LocARNA which uses unaligned sequences with paths to the correct input files and folders. Thus, use the same input FASTA sequences generated in Step2. LocARNA is in the container - ignore the version and kindly used the latest version [v2]. 
+The script 'locarnap_array_job.sh' can be used as a guide to perform LocARNA which uses unaligned sequences with paths to the correct input files and folders. Thus, use the same input FASTA sequences generated in Step2. LocARNA is in the container - the version is only used here as an example and kindly use the latest version. 
 
 Command to execute locarna from within container. Modify the path to the container sif file. Modify the paths in the script file as well.
 

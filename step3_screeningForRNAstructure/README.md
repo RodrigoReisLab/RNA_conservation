@@ -1,6 +1,6 @@
 ### This step is to screen for clusters with a potential to form a common structure. 
 
-We do the screening with RNALalifold which is a part of the Vienna RNA package. This package is available within the container (docker or singularity images). Ignore the version of the container used in this step and used the latest version [v2] while performing all the steps. Recommended is to have the singularity .sif file in an accessible directory. From this step onwards, we will use this container more frequently.
+We do the screening with RNALalifold which is a part of the Vienna RNA package. This package is available within the container (docker or singularity images). Ignore the version of the container used in this step and used the latest version while performing all the steps. Recommended is to have the singularity .sif file in an accessible directory. From this step onwards, we will use this container more frequently.
 
 
 The cluster FASTA files are taken as input for this step. Most likely in a separate folder named splits. RNALalifold requires inout as an alignment (.aln) file. This can be obtained using mmseqs2 (not tested) or clustal omega. In the studies, we have used clustal omega.
@@ -23,9 +23,9 @@ The output will be .aln file which is used as input for the RNALalifold screenin
 ### To perform RNALalifold screening
 In this step, kindly use the script 'rnalalifold_array_job.sh' as a guide to execute RNALalifold. Within this script you have the following command which uses the container directly.
 
-	singularity exec -B ../${clusterName}:/input /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.sif RNALalifold -T 21 --noLP /input/${clusterName}_aligned.aln > ${clusterName}_RNALalifold.out
+	singularity exec -B ../${clusterName}:/input /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.1.sif RNALalifold -T 21 --noLP /input/${clusterName}_aligned.aln > ${clusterName}_RNALalifold.out
 
-**Note:** Change path of rnatools_v2.sif file to the correct path in your directory.
+**Note:** Change path of rnatools_v2.1.sif file to the correct path in your directory.
 
 
 Options used:

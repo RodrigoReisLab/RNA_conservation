@@ -6,7 +6,7 @@ The script 'locarnap_array_job.sh' can be used as a guide to perform LocARNA whi
 
 Command to execute locarna from within container. Modify the path to the container sif file. Modify the paths in the script file as well.
 
-	singularity exec -B ../${clusterName}:/input /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v1.sif mlocarna --probabilistic --tgtdir ${clusterName}_locarnap --moreverbose --stockholm --local-progressive --threads=3 --rnafold-temperature=21.0 /input/${clusterName}_cluster.fasta  
+	singularity exec -B ../${clusterName}:/input /storage/workspaces/ips_reislab/reislab/Software/rnatools/rnatools_v2.1.sif mlocarna --probabilistic --tgtdir ${clusterName}_locarnap --moreverbose --stockholm --local-progressive --threads=3 --rnafold-temperature=21.0 /input/${clusterName}_cluster.fasta  
 
 Options used:
 - --probabilistic: the alignments are scored based on match probabilities 

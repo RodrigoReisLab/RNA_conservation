@@ -3,9 +3,11 @@
 
 _Copyright 2025 [Dolly Mehta](https://github.com/DollyCM)_
 
-This pipeline was created to find conserved RNA structures in genomes or sequence datasets (eg. UTR regions, RNAs from transcriptomes).
+Please cite: [preprint_soon](https://www.biorxiv.org/)
 
-We have applied this pipeline to plastid genomes [preprint_soon](https://www.biorxiv.org/).
+This pipeline was created to find conserved RNA structures in genomes or sequence datasets (eg. UTR regions, RNAs from transcriptomes). 
+
+We have applied this pipeline to [plastid genomes](https://www.biorxiv.org/).
 
 ## **Pipeline to predict conserved RNA structures in genomes or sequences of interest.**
 

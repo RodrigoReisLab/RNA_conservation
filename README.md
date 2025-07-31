@@ -33,7 +33,7 @@ Figure 1: Overview of the pipeline. Each of the box are color-coded and marked t
 
 3. seqtk YAML - for basic sequence manipulations, including reverse complement input sequences. YAML file is provided in the respective Step2 clustering folder.
 
-4. RNA-SCoRE program - for evaluating alignments for structure. It can be obtained from [here] (https://github.com/RodrigoReisLab/RNA-SCoRE)
+4. RNA-SCoRE program - for evaluating alignments for structure. It can be obtained from [here](https://github.com/RodrigoReisLab/RNA-SCoRE)
 
 StepMisc folder contains miscellaneous steps to use the motifs for analyses in obtaining phylogenetic spread and gene context.
 

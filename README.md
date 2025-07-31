@@ -1,5 +1,5 @@
 # **Genome-wide discovery of conserved RNA secondary structures**
-_Author: [Dolly Mehta](https://orcid.org/0000-0002-4435-5183)_
+_Copyright: [Dolly Mehta](https://github.com/DollyCM) 2025_
 ------------------------------------------------------------
 
 This pipeline was created to find conserved RNA structures in genomes or sequence datasets (eg. UTR regions, RNAs from transcriptomes).

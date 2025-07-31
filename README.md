@@ -1,5 +1,4 @@
-#**Genome-wide discovery of conserved RNA secondary structures**
-
+# **Genome-wide discovery of conserved RNA secondary structures**
 _Author: [Dolly Mehta](https://orcid.org/0000-0002-4435-5183)_
 ------------------------------------------------------------
 
@@ -7,7 +6,7 @@ This pipeline was created to find conserved RNA structures in genomes or sequenc
 
 We have applied this pipeline to plastid genomes [preprint_soon](https://www.biorxiv.org/).
 
-**Pipeline to predict conserved RNA structures in genomes or sequences of interest.**
+## **Pipeline to predict conserved RNA structures in genomes or sequences of interest.**
 
 The pipeline is in 6-7 steps starting from input of sequences. Please make sure the sequences are in the DNA format (no 'U'), if starting from step 0. 
 

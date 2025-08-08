@@ -3,11 +3,12 @@
 
 _Copyright 2025 [Dolly Mehta](https://github.com/DollyCM)_
 
-Please cite: [preprint_soon](https://www.biorxiv.org/)
+Please cite: [Genome-wide identification of conserved RNA structure in plastids](https://doi.org/10.1101/2025.08.06.668526)
+Authors: Dolly Mehta, Jingmin Hua and Rodrigo Siqueira Reis
 
 This pipeline was created to find conserved RNA structures in genomes or sequence datasets (eg. UTR regions, RNAs from transcriptomes). 
 
-We have applied this pipeline to [plastid genomes](https://www.biorxiv.org/).
+We have applied this pipeline to [plastid genomes](https://doi.org/10.1101/2025.08.06.668526).
 
 ## **Pipeline to predict conserved RNA structures in genomes or sequences of interest.**
 
